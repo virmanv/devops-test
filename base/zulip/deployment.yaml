@@ -1,0 +1,55 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: zulip
+  labels:
+    app: zulip
+  spec:
+    containers:
+    - name: zulip
+      image: "zulip/docker-zulip"
+      version: latest
+      imagePullPolicy: IfNotPresent
+      env:
+      - name: DISABLE_HTTPS
+        value: "True"
+      - name: SETTING_EXTERNAL_HOST
+        value: "chat.autopilot.com"
+      - name: DB_HOST
+        value: postgres
+      - name: DB_PASS
+        valueFrom:
+          secretKeyRef:
+            name: pgsecret
+            key: PG_PASS
+      - name: SECRETS_postgres_password
+        valueFrom:
+          secretKeyRef:
+            name: postgres
+            key: postgres-password
+      - name: SETTING_MEMCACHED_LOCATION
+        value: memcached
+      - name: SETTING_RABBITMQ_HOST
+        value: vv-rabbitmq
+      - name: SECRETS_rabbitmq_password
+        valueFrom:
+          secretKeyRef:
+            name: vv-rabbitmq
+            key: vv-rmq-secret
+      - name: SETTING_REDIS_HOST
+        value: vv-redis-master
+      - name: SECRETS_redis_password
+        valueFrom:
+            secretKeyRef:
+              name: vv-redis
+              key: redis-password
+      - name: SECRETS_email_password
+        valueFrom:
+          secretKeyRef:
+            name: zulip
+            key: email-password
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+      resources: {}

@@ -1,0 +1,90 @@
+apiVersion: v1
+data:
+  zulip.env: |
+    DISABLE_HTTPS=true
+    SETTING_EXTERNAL_HOST=chat.autopilot.com
+    SETTING_ZULIP_ADMINISTRATOR=calvien@autopilot.com
+    DB_HOST=postgres
+    SETTING_MEMCACHED_LOCATION=memcached
+    SETTING_RABBITMQ_HOST=rabbitmq
+    SECRETS_rabbitmq_password=
+    SECRETS_postgres_password=
+kind: ConfigMap
+metadata:
+  name: zulip-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: zulip
+  name: zulip
+  namespace: chat
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: zulip
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  labels:
+    app: zulip
+  name: zulip
+  spec:
+    containers:
+    - env:
+      - name: DISABLE_HTTPS
+        value: "True"
+      - name: SETTING_EXTERNAL_HOST
+        value: chat.autopilot.com
+      - name: DB_HOST
+        value: postgres
+      - name: DB_PASS
+        valueFrom:
+          secretKeyRef:
+            key: PG_PASS
+            name: pgsecret
+      - name: SECRETS_postgres_password
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: postgres
+      - name: SETTING_MEMCACHED_LOCATION
+        value: memcached
+      - name: SETTING_RABBITMQ_HOST
+        value: vv-rabbitmq
+      - name: SECRETS_rabbitmq_password
+        valueFrom:
+          secretKeyRef:
+            key: vv-rmq-secret
+            name: vv-rabbitmq
+      - name: SETTING_REDIS_HOST
+        value: vv-redis-master
+      - name: SECRETS_redis_password
+        valueFrom:
+          secretKeyRef:
+            key: redis-password
+            name: vv-redis
+      - name: SECRETS_email_password
+        valueFrom:
+          secretKeyRef:
+            key: email-password
+            name: zulip
+      image: zulip/docker-zulip
+      imagePullPolicy: IfNotPresent
+      name: zulip
+      ports:
+      - containerPort: 80
+        name: http
+        protocol: TCP
+      resources: {}
+      version: latest

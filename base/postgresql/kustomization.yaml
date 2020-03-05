@@ -1,0 +1,20 @@
+generatorOptions:
+  disableNameSuffixHash: true
+commonLabels:
+  app: postgres
+
+
+
+configMapGenerator:
+  - name: pgmap
+    literals:
+      - POSTGRES_USER=zulip
+      - POSTGRES_DB=zulip
+secretGenerator:
+  - name: pgsecret
+    literals:
+      - PG_PASS=admin
+resources:
+- deployment.yaml
+- service.yaml
+- storage.yaml

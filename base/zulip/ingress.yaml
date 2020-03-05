@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: zulip
+  labels:
+    app: zulip
+  annotations:
+    kubernetes.io/tls-acme: 'true'
+spec:
+    backend:
+      serviceName: zulip
+      servicePort: http
+    tls:
+      - secretName: zulip-tls-cert
+        hosts:
+          - chat.autopilot.com

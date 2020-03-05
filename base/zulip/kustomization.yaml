@@ -1,0 +1,9 @@
+generatorOptions:
+  disableNameSuffixHash: true
+resources:
+- deployment.yaml
+- service.yaml
+configMapGenerator:
+- name: zulip-configmap
+  files:
+    - zulip.env

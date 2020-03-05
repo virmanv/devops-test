@@ -1,0 +1,4 @@
+resources:
+- memcache
+- postgresql
+- zulip

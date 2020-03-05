@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - image: "zulip/zulip-postgresql:latest"
+        resources: 
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 500Mi
+            cpu: 200m
+        name: postgres
+        imagePullPolicy: "IfNotPresent"
+        env:
+        - name: POSTGRES_USER
+          valueFrom: 
+            configMapKeyRef:
+              name: pgmap
+              key: POSTGRES_USER
+        - name: POSTGRES_DB
+          valueFrom: 
+            configMapKeyRef:
+              name: pgmap
+              key: POSTGRES_DB
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgsecret
+              key: PG_PASS
+

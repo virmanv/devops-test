@@ -1,0 +1,13 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: memcached
+  labels:
+    app: memcached
+spec:
+  serviceName: memcached
+  replicas: 6
+  template:
+    metadata:
+      labels:
+        app: memcached
